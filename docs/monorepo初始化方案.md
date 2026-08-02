@@ -53,58 +53,50 @@
 
 ### 3.1 目标目录结构
 
+> 前端视角骨架（初始化粒度）；含 OGAS 的完整结构见 [monorepo文件结构.md](monorepo文件结构.md)。已落地项与本树一致，业务页面按 spec 规划逐步补齐。
+
 ```
-frontend/                         # monorepo 根（pnpm workspace + turbo）
-├── package.json                  # 锁定 packageManager
+Glushkov_OGAS/                  # monorepo 根（pnpm workspace + turbo + go.work）
+├── package.json                # 锁定 packageManager（pnpm@11.14.0）
 ├── pnpm-workspace.yaml
-├── turbo.json                    # pipeline：codegen 前置，串起各检查与 build
-├── tsconfig.base.json            # 各包 tsconfig 继承并配置 paths
-├── oxlint.json / oxfmt 配置
-├── dependency-cruiser 配置
-├── lefthook.yml                  # 暂存区并行任务
-├── syncpack 配置
+├── turbo.json                  # pipeline：codegen 前置，串起各检查与 build
+├── tsconfig.base.json          # 各包 tsconfig 继承
+├── oxlint.json / oxfmt / dependency-cruiser / lefthook.yml / syncpack
 ├── .changeset/
+├── flake.nix / .envrc          # ★ Nix devShell 环境管理（团队跨平台）
+├── .devcontainer/              # ★ Dev Container（Windows 备选）
+├── playwright.config.ts / e2e/ # ★ E2E 基础配置
 │
-├── specs/                        # 规格单一事实源
+├── specs/                      # 规格单一事实源
 │   ├── overview.md
-│   ├── adr/                      # 架构决策记录，只增不改
-│   ├── features/                 # 功能规格：requirements/design/tasks
+│   ├── adr/                    # 架构决策记录，只增不改
+│   ├── features/               # 功能规格：requirements/design/tasks
 │   └── templates/
 │
-├── apps/                         # 运行时入口层 —— 互不依赖
-│   ├── web/                      # 唯一带 SSR 的 target（Next.js App Router）
-│   │   ├── app/
-│   │   │   ├── layout.tsx             # 根布局 = app-shell，SSR 直出外壳
-│   │   │   ├── (chat)/c/[id]/page.tsx # 对话页：历史 SSR，实时区 "use client"
-│   │   │   ├── share/[token]/page.tsx # 分享页：SSR + 可抓取
-│   │   │   └── kb/[docId]/page.tsx    # 知识库公开页：SSR / ISR
-│   │   └── src/
-│   │       ├── platform-web.ts        # 注入 web 版 platform 实现
-│   │       └── providers.tsx
-│   ├── desktop/                  # Electron（纯 CSR）
-│   │   ├── electron/             # 主进程 + ipc
+├── apps/                       # 运行时入口层 —— 互不依赖
+│   ├── web/                    # 唯一带 SSR 的 target（Next.js App Router）
+│   │   ├── app/                # App Router：对话/分享/知识库页按 spec 规划
+│   │   └── src/platform-web.ts # 注入 web 版 platform 实现
+│   ├── desktop/                # Electron（纯 CSR）
+│   │   ├── electron/           # 主进程 + ipc
 │   │   ├── preload/bridge.ts
-│   │   └── renderer/             # Vite 打包的 CSR
-│   │       └── platform-electron.ts  # 注入 electron 版 platform（走 IPC）
-│   └── extension/                # 浏览器扩展（纯 CSR，MV3）
-│       ├── background/ content/ sidepanel/ popup/
-│       └── platform-extension.ts # 注入扩展版 platform（chrome.*）
+│   │   └── renderer/           # Vite 打包的 CSR
+│   ├── extension/              # 浏览器扩展（纯 CSR，MV3）
+│   │   ├── background/ content/ sidepanel/ popup/
+│   │   └── platform-extension.ts
+│   └── approval/               # ★ OGAS 审批 H5（Vite + React + Tailwind）
 │
-├── packages/                     # 跨运行时共享 —— 越靠下越稳定
-│   ├── platform/                 # 枢纽：只有接口，无实现
-│   │   └── src/{types.ts, context.tsx, index.ts}
-│   ├── core/                     # 逻辑层 —— 100% 复用，零 UI
-│   │   └── src/{api/, store/{atoms,entities}, stream/, message-adapter/, query.ts, types/}
-│   ├── ui/                       # 通用组件 —— 环境无关
-│   │   └── src/{prompt-input/, editor/, chat-layout/, app-sidebar/, primitives/}
-│   └── features/                 # 业务模块 —— 环境无关，靠 platform 注入
-│       └── src/{stream/, chat/, project/, task-center/, skill/, tools/, generative-ui/, otp-auth/}
+├── packages/                   # 跨运行时共享 —— 越靠下越稳定
+│   ├── platform/               # 枢纽：只有接口，无实现
+│   ├── core/                   # 逻辑层 —— 100% 复用，零 UI
+│   ├── ui/                     # 通用组件 —— 环境无关
+│   └── features/               # 业务模块 —— 环境无关，靠 platform 注入
 │
-├── shared/                       # 跨端纯契约
+├── shared/                     # 跨端纯契约
 │   └── src/{schema/, generated/, constants/}
 │
-├── docs/                         # 面向读者的现状文档
-└── notes/                        # 研发过程记录
+├── docs/                       # 面向读者的现状文档
+└── notes/                      # 研发过程记录
 ```
 
 ### 3.2 各包职责
@@ -114,6 +106,7 @@ frontend/                         # monorepo 根（pnpm workspace + turbo）
 | apps/web          | 唯一 SSR target，服务端组件优先 | App Router 路由、metadata/OG 卡片、platform-web 注入                      |
 | apps/desktop      | Electron 纯 CSR                 | 主进程 + ipc、preload bridge、Vite renderer、platform-electron 注入       |
 | apps/extension    | 扩展纯 CSR（MV3）               | background / content / sidepanel / popup、platform-extension 注入         |
+| apps/approval    | OGAS 审批 H5（Vite + React + Tailwind） | 高危操作确认、ask 消息渲染、复用 packages/ui 与 shared/schema               |
 | packages/platform | 环境差异抽象，只有接口无实现    | PlatformAPI 类型、context（usePlatform）                                  |
 | packages/core     | 纯逻辑，零 UI，100% 复用        | API 封装、Jotai store、实体缓存、SSE 解析、message-adapter、query.ts      |
 | packages/ui       | 环境无关通用组件                | prompt-input、editor、chat-layout、app-sidebar、primitives                |
@@ -183,6 +176,7 @@ core、ui、features 三层中出现 `window`、`document`、`chrome`、`process
 12. 搭建 Vitest 与 Playwright 基础配置
 13. CI 增加「codegen 后 git diff 为空」的漂移校验
 14. 验收：`pnpm install` 后 `turbo run build` 全绿，三端 app 可启动
+15. 环境管理：配置 `flake.nix` / `.envrc`（Nix devShell）与 `.devcontainer/`（Windows 备选），团队跨平台统一版本（见 `docs/环境管理.md`）
 
 ## 6. 来源
 

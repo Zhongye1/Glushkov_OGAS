@@ -12,3 +12,6 @@ coverage/
 
 # Go 构建产物
 /services/dispatcher/dispatcher
+
+# direnv
+.direnv/

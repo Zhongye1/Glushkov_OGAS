@@ -38,6 +38,8 @@ Glushkov_OGAS/
 │   ├── compose/                     #   docker-compose：gate/flow/dispatcher/arkhiv/postgres/milvus
 │   ├── k8s/                         #   （可选）K8s manifests
 │   └── scripts/                     #   初始化、迁移、一键拉起、liskin runtime 安装注册
+├── .devcontainer/                    # ★ Dev Container（Windows/不熟悉 Nix 的备选）
+├── flake.nix / .envrc               # ★ Nix devShell 环境管理（团队跨平台）
 ├── specs/                           # 前端规格（ADR / 功能规格 / 模板，原样保留）
 ├── docs/                            # 文档（RFC、选型、结构、设计文档拆解）
 │   └── todo/                        #   设计文档补充（七份正文待写）

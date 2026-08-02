@@ -4,7 +4,7 @@
 
 ## 背景与目标
 
-本工程是一个 agentic RAG 应用的前端，同时跑在三个运行时宿主上：带 SSR 的 Web 站点、Electron 桌面端、浏览器扩展。选型目标是最大化三端业务代码复用，同时保证构建可编排、可增量缓存、质量门槛可强制。
+本工程是一个 agentic RAG 应用的前端，同时跑在三个运行时宿主上：带 SSR 的 Web 站点、Electron 桌面端、浏览器扩展。选型目标是最大化三端业务代码复用，同时保证构建可编排、可增量缓存、质量门槛可强制。团队跨平台（Linux / macOS / Windows），开发环境要求可复现。
 
 ## 选型总览
 
@@ -32,13 +32,15 @@
 | E2E              | Playwright               | 覆盖 SSR 的 Web 端与流式对话                          | ADR-0004       |
 | 环境变量校验     | @t3-oss/env + Zod        | 可选，后续评估                                        | ADR-0004       |
 | 组件开发         | Storybook                | 可选，让 packages/ui 脱离宿主开发                     | ADR-0004       |
-| Node 版本锁定    | Volta / .nvmrc + engines | 可选                                                  | ADR-0004       |
+| Node/pnpm 锁定    | Nix devShell（nodejs_22 + corepack） | 环境可复现，锁定 node 22 与 pnpm 11.14.0            | 环境管理       |
+| 环境管理         | Nix devShell + Dev Container       | Linux/macOS 原生，Windows 走 WSL2 或 Dev Container  | 环境管理       |
 | 提交信息规范     | commitlint               | 可选，用 changesets 后可弱化                          | ADR-0004       |
 
 ## Monorepo 底座（ADR-0001）
 
 - 包管理器用 **pnpm workspace**。硬链接加严格 node_modules 结构杜绝幽灵依赖，为后续强制的单向依赖架构打底；npm 与 yarn 的扁平化会让底层包意外引用到本不该依赖的东西。
 - 任务编排用 **Turborepo**。核心诉求是「codegen → core → ui → features → apps 按序构建并做增量缓存」，由 pipeline 与 dependsOn 覆盖，配置心智极简；codegen 作为可缓存、可追踪的流水线节点，比手写 prebuild 脚本可靠。
+- pnpm 11 起配置迁移到 `pnpm-workspace.yaml`：`allowBuilds`（原生依赖构建白名单，如 esbuild/lefthook）与 `confirmModulesPurge` 在无 TTY 环境需要显式声明。
 - 放弃方案：**Nx**（概念复杂度高，generators 与 enforce-module-boundaries 对当前规模不划算，保留未来迁移空间）、**yarn berry**（配置心智重）、**npm workspace**（编排能力弱）。
 
 ## 运行时与渲染（ADR-0002）
@@ -72,11 +74,20 @@
 - **codegen** 作为 Turborepo pipeline 的 build 前置节点，`outputs` 指向 `shared/generated`；CI 增加「codegen 后 git diff 为空」的漂移校验，防止 schema 改动未提交生成物。
 - 所有检查（lint、fmt、typecheck、depcruise、test）纳入 Turborepo pipeline，按拓扑顺序执行并增量缓存。
 
+## 环境管理（Nix + Dev Container）
+
+- **主方案是 Nix devShell**（`flake.nix` + flake.lock）：Linux/macOS 原生，Windows 走 WSL2。Node 22（nixpkgs `nodejs_22`）、Go（`go.work` 要求 1.25+）、Python 3.12（arkhiv）由 nixpkgs 提供；pnpm 由 corepack 锁定为 `11.14.0`，与根 `package.json#packageManager` 完全一致。
+- **Dev Container 是 Windows/备选路径**（`.devcontainer/devcontainer.json`）：VS Code + Docker Desktop 一键进入，features 提供 node 22 / go 1.25 / python 3.12，postCreate 自动 corepack + `pnpm install`。
+- **TS 工具链不进 Nix 侧**：turbo/oxlint/oxfmt/lefthook 等由 pnpm 管理（lockfile 已锁定版本），避免双份版本漂移。
+- **服务依赖不归 Nix 管**：postgres / milvus 走既有 docker compose。
+- 详细用法与 Windows 指南见 `docs/环境管理.md`。
+
 ## 明确不引入
 
 - **Prettier / prettier-plugin-tailwindcss**：格式与排序由 oxfmt 覆盖。
 - **husky**：Git hooks 由 lefthook 覆盖。
 - **Nx**：编排与缓存由 Turborepo 覆盖，当前规模不划算。
+- **Volta / asdf / mise / .nvmrc**：只解决 Node/运行时版本，覆盖不了 Go/Python 与系统依赖；版本锁定由 Nix devShell 统一接管。
 
 ## 来源
 
@@ -85,3 +96,4 @@
 - ADR-0003：用 platform adapter 抽象层吸收三端环境差异
 - ADR-0004：代码质量工具链选型（oxlint / oxfmt / dependency-cruiser 等）
 - 功能规格：monorepo-toolchain、agentic-stream、share-page
+- 环境管理：docs/环境管理.md（Nix devShell + Dev Container 跨平台方案）
