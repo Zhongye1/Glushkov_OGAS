@@ -84,7 +84,7 @@ infra/{compose,k8s,scripts}  .github/workflows  .changeset
 | 6 | `Type 'Promise<Window | null>' is not assignable to 'Promise<void>'` | desktop `openUrl` 实现返回类型不匹配 | 改为 `window.open(...)` 后不 return |
 | 7 | syncpack：`typescript ^5.6.0 → ^5.9.3` 不一致、`dependencyTypes/lintVersions` 弃用 | 版本漂移 + syncpack 15 配置迁移 | 统一 `typescript ^5.9.3`；`.syncpackrc.json` 只留 `sortFirst` |
 | 8 | depcruise：`Can't open a config file at the default location` | 包级运行时找不到根配置 | 各包 depcruise script 显式 `--config ../../.dependency-cruiser.cjs` |
-| 9 | sharp `Attempting to build from source ... Failed` | 平台预编译二进制缺失 | 不阻断构建，Next 图片优化后续处理 |
+| 9 | sharp `Attempting to build from source ... Failed` | postinstall 探测失败后回退源码构建（预编译二进制实际已装） | 已解决：`allowBuilds.sharp: false`，二进制经 optionalDependencies 提供，`require('sharp')` 验证可用 |
 
 另有一处工程修正：`apps/desktop/renderer/src/platform-electron.ts` 原从 `@ogas/shared` 引 `Platform` 类型，改从 `@ogas/platform` 引入（shared 是契约层，不承载平台类型）。
 
@@ -103,9 +103,8 @@ infra/{compose,k8s,scripts}  .github/workflows  .changeset
 
 ## 6. 遗留事项
 
-- **sharp**：无预编译二进制时从源码构建失败，Next 图片优化在需要时再处理
 - **Playwright 浏览器**：安装时以 `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` 跳过，跑 E2E 前需 `pnpm exec playwright install`
-- **Electron 二进制**：`ELECTRON_SKIP_BINARY_DOWNLOAD=1` 跳过，运行 desktop 前需补装
+- **Electron 二进制（已搁置，后续再做）**：`ELECTRON_SKIP_BINARY_DOWNLOAD=1` 跳过，运行 desktop 前需补装（建议 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ node node_modules/.pnpm/electron@*/node_modules/electron/install.js`）
 - **fork 代码**：dispatcher（←Multica）、arkhiv（←EagleRAG）当前为占位，待法务确认后复制上游并写 REBASE 基线
 - **执行机形态 / 事件总线时机 / 审批页托管**：见 `docs/monorepo文件结构.md` 第 6 节
 

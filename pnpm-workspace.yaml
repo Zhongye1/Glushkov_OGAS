@@ -10,7 +10,7 @@ packages:
 allowBuilds:
   esbuild: true
   lefthook: true
-  sharp: true
+  sharp: false  # 预编译二进制经 optionalDependencies 提供，无需 postinstall
   protobufjs: true
   electron: false
 
