@@ -47,7 +47,8 @@ Glushkov_OGAS/
 ├── pnpm-workspace.yaml              # TS workspace：apps/* + packages/* + shared/* + services/{gate,flow}
 ├── turbo.json                       # 任务编排（TS pipeline；Go/Python 以独立 task 接入）
 ├── package.json / tsconfig.base.json / oxlint.json / oxfmt.json / dependency-cruiser
-└── Readme.md                        # RFC-20260802（OGAS 架构）
+├── Readme.md                        # 项目简介（六段式 README）
+└── RFC.md                           # RFC-20260802（OGAS 架构）
 ```
 
 ## 3. 各部分职责

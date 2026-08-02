@@ -1,6 +1,6 @@
 # OGAS 技术选型
 
-> 本文档整合 [RFC-20260802](../Readme.md) 中五组件的职责边界与交互关系，落到可实现的代码层面选型，是 OGAS 后端的技术选型单一入口。前端工程（agentic RAG 三端 monorepo）的选型见 `docs/monorepo技术选型.md`。
+> 本文档整合 [RFC-20260802](../RFC.md) 中五组件的职责边界与交互关系，落到可实现的代码层面选型，是 OGAS 后端的技术选型单一入口。前端工程（agentic RAG 三端 monorepo）的选型见 `docs/monorepo技术选型.md`。
 
 ## 1. 选型原则
 

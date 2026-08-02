@@ -1,6 +1,18 @@
 {
   description = "Glushkov OGAS monorepo 开发环境（Linux/macOS 原生；Windows 用 WSL2 或 .devcontainer）";
 
+  # 仓库级 Nix 配置：国内优先的二进制缓存镜像，官方 cache 兜底。
+  # 首次使用会提示接受 flake 配置（交互输入 y，或 --accept-flake-config / direnv 自动接受）。
+  nixConfig = {
+    substituters = [
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+      "https://cache.nixos.org/"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -29,8 +41,6 @@
           ];
 
           shellHook = ''
-            # 用 corepack 锁定 pnpm 版本，与 package.json#packageManager 一致
-            corepack enable
             corepack prepare pnpm@11.14.0 --activate
 
             echo ""

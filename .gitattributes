@@ -1,0 +1,4 @@
+# Normalize line endings to LF for all text files.
+# Required because this repo is shared between Windows (git for Windows,
+# core.autocrlf=true) and WSL2/nix (bash/corepack/pnpm break on CRLF).
+* text=auto eol=lf
