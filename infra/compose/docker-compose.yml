@@ -1,0 +1,38 @@
+# OGAS 本地一键拉起（骨架）：postgres 为 MVP 事件存储，milvus 为 Arkhiv 向量库
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ogas
+      POSTGRES_PASSWORD: ogas
+      POSTGRES_DB: ogas
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # milvus 完整依赖（etcd/minio）在阶段二按需补齐
+  # milvus:
+  #   image: milvusdb/milvus:v2.4
+  #   ports: ["19530:19530"]
+
+  dispatcher:
+    build: ../../services/dispatcher
+    ports: ["8080:8080"]
+
+  gate:
+    build: ../../services/gate
+    ports: ["3001:3001"]
+    depends_on: [dispatcher]
+
+  flow:
+    build: ../../services/flow
+    ports: ["3002:3002"]
+    depends_on: [dispatcher]
+
+  arkhiv:
+    build: ../../services/arkhiv
+    ports: ["3003:3003"]
+
+volumes:
+  pgdata:
