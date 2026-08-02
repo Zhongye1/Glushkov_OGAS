@@ -1,0 +1,33 @@
+{
+  "name": "glushkov-ogas",
+  "private": true,
+  "packageManager": "pnpm@11.14.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "depcruise": "turbo run depcruise",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "changeset": "changeset",
+    "syncpack": "syncpack lint"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.1",
+    "@playwright/test": "^1.62.1",
+    "dependency-cruiser": "^18.1.0",
+    "lefthook": "^2.1.10",
+    "oxfmt": "^0.61.0",
+    "oxlint": "^1.76.0",
+    "syncpack": "^15.3.2",
+    "turbo": "^2.10.8",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "version": "0.0.0"
+}

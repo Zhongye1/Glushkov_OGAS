@@ -1,0 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+  - shared
+  - shared/*
+  - services/gate
+  - services/flow
+
+# pnpm 11：构建脚本白名单（electron 跳过二进制下载，保持 false）
+allowBuilds:
+  esbuild: true
+  lefthook: true
+  sharp: true
+  protobufjs: true
+  electron: false
+
+# pnpm 11：无 TTY 环境不询问，直接按需重建 modules
+confirmModulesPurge: false
