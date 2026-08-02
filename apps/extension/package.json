@@ -1,0 +1,20 @@
+{
+  "name": "@ogas/extension",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-static.mjs",
+    "lint": "oxlint background content sidepanel popup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "depcruise": "depcruise background content sidepanel popup --config ../../.dependency-cruiser.cjs"
+  },
+  "dependencies": {
+    "@ogas/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.280",
+    "typescript": "^5.9.3"
+  }
+}

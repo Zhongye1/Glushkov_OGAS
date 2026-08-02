@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "OGAS Extension",
+  "version": "0.0.0",
+  "description": "agentic RAG 浏览器扩展（纯 CSR，MV3）",
+  "background": { "service_worker": "background/index.js" },
+  "action": { "default_popup": "popup/index.html" },
+  "permissions": ["storage", "sidePanel"],
+  "side_panel": { "default_path": "sidepanel/index.html" }
+}
