@@ -1,8 +1,3 @@
----
-published: 2026-07-28 23:46:50
-description: OGAS 是一个自托管的 Agent 研发生命周期协作平台。它让整个团队能以受控、可编排、可回滚的方式驱动 Agent，从一个需求的知识检索，一路自动推进到代码交付和线上部署。
----
-
 ![](https://pic4.zhimg.com/v2-c7e8e75221bb2c108789f34db132c601_r.jpg)
 
 # [RFC-20260802]: OGAS (Operational Generate Agent System)
