@@ -70,11 +70,11 @@
 
 | 关注点         | 选型                                        | 说明                                                                   |
 | -------------- | ------------------------------------------- | ---------------------------------------------------------------------- |
-| 底座           | 沿用 EagleRAG（MCP Server + Milvus）        | 提供 `/mcp`（streamable HTTP）与 stdio；ingest/query/retrieve 直接复用 |
+| 底座           | Python（fork EagleRAG，MCP Server + Milvus）| 提供 `/mcp`（streamable HTTP）与 stdio；ingest/query/retrieve 直接复用 |
 | 权限封装       | 在 plugin_namespace 上叠加 workspace 级权限 | 不同业务线知识库隔离，成员按 workspace 检索（RFC 4.5）                 |
 | 命名空间结构   | PRD / 接口契约 / UI 规范 / 历史决策         | 结构化知识分区，供 Agent 检索时缩小范围                                |
 | 与 liskin 对接 | 作为 MCP 工具经 ToolPort 注入               | liskin 的 MCP client 是阶段一主线，Arkhiv 就是它的首个工具来源         |
-| 待确认         | EagleRAG 的具体语言与可扩展性               | 若封装层改动量大，需评估自研检索入口的替代方案                         |
+| 待确认         | 封装层改动量（语言已确认 Python）            | 权限/命名空间封装若改动量大，需评估自研检索入口的替代方案     |
 
 ## 7. liskin（执行面，上游既定）
 
@@ -95,7 +95,7 @@
 
 - **执行机形态**：人手一台常驻开发机 vs 内网集中执行机，直接影响 Dispatcher 部署拓扑与 Daemon 注册策略（阶段二前拍板）。
 - **事件总线时机**：MVP 按本文档走 WS + Postgres；当出现并行汇聚、跨系统事件重放或补偿需求时，再评估 Kafka/NATS 或直接升级 Temporal。
-- **EagleRAG 可扩展性**：确认其语言与封装层改动量，决定 Arkhiv 是纯增量改造还是需要重写检索入口。
+- **Arkhiv 封装改动量**：语言已确认 Python；评估权限/命名空间封装的改动量，决定纯增量改造还是重写检索入口。
 - **审批页托管位置**：飞书内嵌 H5 还是独立 Web 审批系统，以及身份校验强度定义。
 
 ## 10. 来源
