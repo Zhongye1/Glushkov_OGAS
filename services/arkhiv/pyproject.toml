@@ -1,7 +1,7 @@
 [project]
 name = "ogas-arkhiv"
 version = "0.0.0"
-description = "OGAS 知识面：基于 EagleRAG fork 的 MCP Server（Milvus + workspace 权限封装）"
+description = "OGAS 知识面：基于 RAG 的 MCP Server"
 requires-python = ">=3.11"
 
 [build-system]
