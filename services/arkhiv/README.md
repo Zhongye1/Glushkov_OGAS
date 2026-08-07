@@ -31,8 +31,21 @@ RAG/
 task dev:rag-core   # 启动 RAG 内核
 task dev:gateway    # 启动 Go 网关
 task dev:web        # 启动 Next.js
-task test:rag-core  # 运行 rag-core 测试
-task check:rag-core # rag-core 全量检查 (test + lint + typecheck)
 ```
+
+## rag-core 任务
+
+所有任务在仓库根目录执行，`dir` 已指向 `apps/rag-core`：
+
+| 任务     | 命令                      | 说明                                   |
+| -------- | ------------------------- | -------------------------------------- |
+| 开发     | `task dev:rag-core`       | 启动 RAG 内核（uvicorn，自动同步依赖） |
+| 同步依赖 | `task sync:rag-core`      | `uv sync` 安装/同步 Python 依赖        |
+| 测试     | `task test:rag-core`      | 运行 pytest                            |
+| 代码检查 | `task lint:rag-core`      | 运行 ruff check                        |
+| 类型检查 | `task typecheck:rag-core` | 运行 mypy（`src`）                     |
+| 格式化   | `task format:rag-core`    | ruff 自动修复 + 格式化                 |
+| MCP      | `task mcp:rag-core`       | 启动 MCP Server（stdio）               |
+| 全量检查 | `task check:rag-core`     | test + lint + typecheck 聚合           |
 
 详见各子目录 README。

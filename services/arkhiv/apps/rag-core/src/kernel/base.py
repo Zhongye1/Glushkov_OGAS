@@ -1,26 +1,7 @@
 from collections.abc import AsyncIterator
-from dataclasses import dataclass, field
 from typing import Protocol
 
-
-@dataclass(slots=True)
-class Chunk:
-    """检索命中的片段，含可溯源信息。"""
-
-    text: str
-    source_path: str
-    line_range: tuple[int, int] | None = None
-    score: float = 0.0
-    source_url: str | None = None
-
-
-@dataclass(slots=True)
-class Answer:
-    """带引用的生成回答。"""
-
-    text: str
-    citations: list[Chunk] = field(default_factory=list)
-    usage: dict[str, int] = field(default_factory=dict)
+from src.api.schemas import Answer, Chunk
 
 
 class RAGKernel(Protocol):

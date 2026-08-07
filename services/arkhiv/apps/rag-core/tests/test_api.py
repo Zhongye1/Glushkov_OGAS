@@ -1,6 +1,6 @@
 from httpx import ASGITransport, AsyncClient
 
-from src.main import app
+from src.api.app import app
 
 
 async def test_health() -> None:

@@ -4,23 +4,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
 
-from src.kernel import Answer, Chunk, RAGKernel, get_kernel
+from src.api.schemas import Answer, AnswerRequest, Chunk, RetrieveRequest
+from src.kernel import RAGKernel, get_kernel
 
 router = APIRouter(tags=["rag"])
 
 KernelDep = Annotated[RAGKernel, Depends(get_kernel)]
-
-
-class RetrieveRequest(BaseModel):
-    query: str = Field(min_length=1)
-    top_k: int = Field(default=10, ge=1, le=100)
-    filters: dict[str, str] | None = None
-
-
-class AnswerRequest(RetrieveRequest):
-    stream: bool = False
 
 
 @router.post("/retrieve", response_model=list[Chunk])

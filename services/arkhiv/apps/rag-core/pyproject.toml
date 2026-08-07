@@ -21,7 +21,7 @@ dev = [
 ]
 
 [project.scripts]
-ogas-rag-mcp = "src.mcp.server:main"
+ogas-rag-mcp = "src.api.mcp_server:main"
 
 [build-system]
 requires = ["hatchling"]

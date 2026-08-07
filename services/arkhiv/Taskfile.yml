@@ -2,12 +2,12 @@ version: "3"
 
 tasks:
   dev:rag-core:
-    desc: 启动 RAG 内核 (FastAPI)
+    desc: 启动 RAG 内核 (FastAPI, 热重载)
     dir: apps/rag-core
     deps:
       - sync:rag-core
     cmds:
-      - uv run uvicorn src.main:app --reload --port 8000
+      - uv run uvicorn src.api.app:app --reload --reload-dir src --port 8000
 
   sync:rag-core:
     desc: 安装/同步 rag-core 依赖 (uv)

@@ -1,10 +1,9 @@
-
 目前RAG系统的主流是 Agentic RAG: 把检索、路由、记忆、工具调用模块化，甚至让 agent 自主决定 "要不要检索、检索几轮、检索哪个库", 走向多路召回和迭代检索。
 
 当前的主要需求是在研发流程的编码一环，实现code agent 的业务知识自主检索：通过业务知识库 RAG MCP Server，覆盖飞书文档、PDF、Word、Markdown 等多种格式，支持嵌套表格、图文混排等复杂内容的解析，打通文档解析、切片、向量化与检索的全链路，使 Agent 可自主检索业务知识，缓解模型缺乏领域上下文导致的幻觉，为代码生成提供事实依据。
 
-
 其需求一致性较高，在设计阶段都是走一条标准 pipeline
+
 1. 文档解析与分块 (Chunking)—— 最影响效果的一环。主流做法是语义分块 / 递归分块 / 按标题层级分块，配合 chunk overlap; 近两年流行 父子分块 (small-to-big): 检索用小块保证精度，喂给 LLM 用大块保证上下文完整。
 2. Embedding 向量化—— 选一个强 embedding 模型 (bge、E5、OpenAI text-embedding-3、Cohere embed 等), 中文场景常用 bge-m3。
 3. 混合检索 (Hybrid Search)——向量检索 + 关键词检索 (BM25) 融合, 几乎是共识：向量管语义、BM25 管精确术语 / 专名，用 RRF (Reciprocal Rank Fusion) 融合两路结果。
@@ -87,26 +86,27 @@ Go 网关只做连接层的事:鉴权、路由、限流削峰、SSE 透传,不�
 
 3.7 内核对外接口契约
 两个入口的契约大致如下,MCP 和 REST 都基于它翻译:
+
 - retrieve(query: str, top_k: int, filters: dict) -> list[Chunk],Chunk 含 text / source_path / line_range / score / source_url。
 - answer(query: str, top_k: int, stream: bool, filters: dict) -> Answer | AsyncIterator[Token],Answer 含 text / citations(list[Chunk]) / usage;stream=True 时返回 token 异步流。
-四、MCP 服务设计(面向 coding agent)
+  四、MCP 服务设计(面向 coding agent)
 
-4.1 MCP 协议定位与适用场景
-MCP 是 Anthropic 提出、现被各家 coding agent 广泛支持的开放协议,让模型以标准方式发现和调用外部工具与数据源 [1]。agent 接上本平台的 MCP server 后,就能把 RAG 当成一个工具随时调用,而不必关心底层实现。
+    4.1 MCP 协议定位与适用场景
+    MCP 是 Anthropic 提出、现被各家 coding agent 广泛支持的开放协议,让模型以标准方式发现和调用外部工具与数据源 [1]。agent 接上本平台的 MCP server 后,就能把 RAG 当成一个工具随时调用,而不必关心底层实现。
 
-4.2 能力暴露方式:Tools vs Resources 的取舍
-MCP 里 Resources 偏只读数据、Tools 偏可执行动作。对 coding agent,最实用的是暴露成 Tools,因为 agent 需要带参数主动发起检索,而不是被动读取固定资源。因此本平台把能力全部设计为 tool。
+    4.2 能力暴露方式:Tools vs Resources 的取舍
+    MCP 里 Resources 偏只读数据、Tools 偏可执行动作。对 coding agent,最实用的是暴露成 Tools,因为 agent 需要带参数主动发起检索,而不是被动读取固定资源。因此本平台把能力全部设计为 tool。
 
-4.3 工具设计
-规划两个核心工具:search_codebase(query, top_k) 返回相关代码片段,ask_docs(question) 返回文档证据。返回一律是结构化片段,带文件路径、行号、来源链接,而不是糊一大段文本,因为这些内容会直接进 agent 的上下文窗口,冗余就是浪费 token。策略上遵循**"给料而非给结论"**:MCP 侧默认只做检索加重排、返回 Top-K 原始片段,把要不要生成、怎么推理留给 agent 自己——这正是 agent 消费者和终端用户的本质差异。
+    4.3 工具设计
+    规划两个核心工具:search_codebase(query, top_k) 返回相关代码片段,ask_docs(question) 返回文档证据。返回一律是结构化片段,带文件路径、行号、来源链接,而不是糊一大段文本,因为这些内容会直接进 agent 的上下文窗口,冗余就是浪费 token。策略上遵循**"给料而非给结论"**:MCP 侧默认只做检索加重排、返回 Top-K 原始片段,把要不要生成、怎么推理留给 agent 自己——这正是 agent 消费者和终端用户的本质差异。
 
-4.4 传输方式选择:stdio vs Streamable HTTP
-MCP 支持 stdio(本地进程,agent 直接拉起)和 Streamable HTTP(远程服务)两种。本平台是中心化部署、多人共用,因此选 Streamable HTTP,stdio 仅在个别本地调试场景保留。官方 Python SDK 提供了快速搭 server 的能力,把内核方法注册成 tool 即可 [4]。
+    4.4 传输方式选择:stdio vs Streamable HTTP
+    MCP 支持 stdio(本地进程,agent 直接拉起)和 Streamable HTTP(远程服务)两种。本平台是中心化部署、多人共用,因此选 Streamable HTTP,stdio 仅在个别本地调试场景保留。官方 Python SDK 提供了快速搭 server 的能力,把内核方法注册成 tool 即可 [4]。
 
-4.5 鉴权与配额
-远程 MCP 走 agent token 鉴权,每个接入方分配独立 token,便于溯源和吊销;配套按 token 做限流和配额,防止单个 agent 打满检索资源。
+    4.5 鉴权与配额
+    远程 MCP 走 agent token 鉴权,每个接入方分配独立 token,便于溯源和吊销;配套按 token 做限流和配额,防止单个 agent 打满检索资源。
 
-4.6 与内核的调用关系
+    4.6 与内核的调用关系
 
 MCP 适配层只调内核的 retrieve(),拿到 list[Chunk] 后裁剪成适合 agent 的结构化返回,不触碰生成逻辑。
 
@@ -169,13 +169,13 @@ RAG 请求 90% 的时间在等下游 LLM,编排层快几毫秒对端到端延迟
 顶层分 apps/(可独立部署的服务)和 packages/(共享代码),三个服务天然对应三个 app,共享层聚焦 API 契约。
 RAG/
 ├── apps/
-│   ├── gateway/            # Go 网关 (Hertz)
-│   ├── rag-core/           # Python FastAPI + RAG 内核
-│   └── web/                # Next.js SSR
+│ ├── gateway/ # Go 网关 (Hertz)
+│ ├── rag-core/ # Python FastAPI + RAG 内核
+│ └── web/ # Next.js SSR
 ├── packages/
-│   ├── contracts/          # API 契约 (OpenAPI / Protobuf)
-│   ├── ts-sdk/             # 由契约生成的 TS 客户端
-│   └── ui/                 # 前端共享组件(可选)
+│ ├── contracts/ # API 契约 (OpenAPI / Protobuf)
+│ ├── ts-sdk/ # 由契约生成的 TS 客户端
+│ └── ui/ # 前端共享组件(可选)
 ├── docker-compose.yml
 ├── Taskfile.yml
 └── README.md
@@ -274,7 +274,6 @@ REST 稳定后,MCP 基本是顺手加一层——同样调 retrieve(),注册成 
 14.3 依赖外部团队/资源的事项
 内网模型渠道(Ark/VikingDB 等)的配额与接入审批、GPU 或托管推理资源、网关接入内网 Hertz/鉴权体系的对接支持,均需相关团队配合。
 
-
 ---
 
 这份文档把我们前面每一轮讨论的结论都落到了对应章节,新增的 Langfuse + Ragas 可观测性/评测选型补在了 7.6 和 11.4,让"上线后怎么知道系统健康、答得准不准"有了明确抓手。
@@ -282,6 +281,7 @@ REST 稳定后,MCP 基本是顺手加一层——同样调 retrieve(),注册成 
 有两个决策点仍需你拍板,会实质影响 6.3 和第八章的契约细节:网关到 rag-core 走 REST 还是 gRPC,以及是否在字节内网落地(决定模型渠道和要不要接 Kitex/Hertz 的 IDL)。定了这两点我可以把契约层和代码生成命令补成可执行的细稿。需要的话,我也可以直接把这份方案写成一篇飞书文档给你,方便团队评审和批注。
 
 References
+
 1. Model Context Protocol
 2. FastAPI
 3. cloudwego/hertz

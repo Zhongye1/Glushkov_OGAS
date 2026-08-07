@@ -3,7 +3,8 @@
 只暴露 retrieve() / answer() 两个语义化入口，任何协议外壳都不得绕过内核。
 """
 
-from src.kernel.base import Answer, Chunk, InMemoryKernel, RAGKernel
+from src.api.schemas import Answer, Chunk
+from src.kernel.base import InMemoryKernel, RAGKernel
 
 __all__ = ["Answer", "Chunk", "InMemoryKernel", "RAGKernel"]
 
