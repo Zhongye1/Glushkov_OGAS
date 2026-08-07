@@ -1,0 +1,83 @@
+version: "3"
+
+tasks:
+  dev:rag-core:
+    desc: 启动 RAG 内核 (FastAPI)
+    dir: apps/rag-core
+    deps:
+      - sync:rag-core
+    cmds:
+      - uv run uvicorn src.main:app --reload --port 8000
+
+  sync:rag-core:
+    desc: 安装/同步 rag-core 依赖 (uv)
+    dir: apps/rag-core
+    cmds:
+      - uv sync
+
+  test:rag-core:
+    desc: 运行 rag-core 测试 (pytest)
+    dir: apps/rag-core
+    cmds:
+      - uv run pytest -q
+
+  lint:rag-core:
+    desc: 运行 rag-core 代码检查 (ruff)
+    dir: apps/rag-core
+    cmds:
+      - uv run ruff check .
+
+  typecheck:rag-core:
+    desc: 运行 rag-core 类型检查 (mypy)
+    dir: apps/rag-core
+    cmds:
+      - uv run mypy src
+
+  format:rag-core:
+    desc: 格式化 rag-core 代码 (ruff)
+    dir: apps/rag-core
+    cmds:
+      - uv run ruff check . --fix
+      - uv run ruff format .
+
+  mcp:rag-core:
+    desc: 启动 rag-core MCP Server
+    dir: apps/rag-core
+    cmds:
+      - uv run ogas-rag-mcp
+
+  check:rag-core:
+    desc: rag-core 全量检查 (test + lint + typecheck)
+    dir: apps/rag-core
+    cmds:
+      - task: test:rag-core
+      - task: lint:rag-core
+      - task: typecheck:rag-core
+
+  dev:gateway:
+    desc: 启动 Go 网关 (Hertz)
+    dir: apps/gateway
+    cmds:
+      - go run ./cmd/server
+
+  dev:web:
+    desc: 启动 Next.js
+    dir: apps/web
+    cmds:
+      - npm run dev
+
+  gen:sdk:
+    desc: 由契约生成 TS 客户端
+    dir: packages/contracts
+    cmds:
+      - cmd: 'echo "TODO: openapi-generator / protoc 生成 packages/ts-sdk"'
+
+  up:
+    desc: 启动全部服务
+    cmds:
+      - docker compose up --build
+
+  down:
+    desc: 停止全部服务
+    cmds:
+      - docker compose down

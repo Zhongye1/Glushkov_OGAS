@@ -1,0 +1,45 @@
+services:
+  gateway:
+    build:
+      context: ./apps/gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rag-core
+    environment:
+      RAG_CORE_URL: http://rag-core:8000
+
+  rag-core:
+    build:
+      context: ./apps/rag-core
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+      - redis
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      REDIS_URL: redis://redis:6379
+
+  web:
+    build:
+      context: ./apps/web
+    ports:
+      - "3000:3000"
+    environment:
+      GATEWAY_URL: http://gateway:8080
+
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  qdrant_data:
