@@ -7,7 +7,7 @@ tasks:
     deps:
       - sync:rag-core
     cmds:
-      - uv run uvicorn src.api.app:app --reload --reload-dir src --port 8000
+      - uv run uvicorn src.app:app --reload --reload-dir src --port 8000
 
   sync:rag-core:
     desc: 安装/同步 rag-core 依赖 (uv)

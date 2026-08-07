@@ -8,9 +8,10 @@ RAG 内核 + 协议外壳（REST / MCP）。遵循 RAG.md 的分层原则：内�
 ```text
 apps/rag-core/
 ├── src/
+│   ├── app.py           # FastAPI 应用（uvicorn src.app:app）
 │   ├── api/             # FastAPI 路由、Pydantic schemas、MCP server
-│   │   ├── app.py       # FastAPI 应用（uvicorn src.api.app:app）
-│   │   ├── mcp_server.py # MCP server（python -m src.api.mcp_server）
+│   │   ├── RESTful/     # REST 路由（health/rag/router）
+│   │   ├── mcp/          # MCP server（python -m src.api.mcp.mcp_server）
 │   │   └── schemas/     # 接口类型定义（HealthResponse/Chunk/Answer/...）
 │   ├── ingest/          # 路由矩阵、Knowhere/PixelRAG 适配器、Celery 任务入口
 │   ├── index/           # Milvus 文本/视觉存储、标签目录、文档结构
@@ -35,8 +36,8 @@ apps/rag-core/
 
 ## 关键入口
 
-- API：`uvicorn src.api.app:app`
-- MCP：`python -m src.api.mcp_server`
+- API：`uvicorn src.app:app`
+- MCP：`python -m src.api.mcp.mcp_server`
 - Workers：`src.tasks.celery_app`（待接入 Celery）
 - 配置：`src/core/config.py`（环境变量，见 `.env.example`）
 
@@ -76,7 +77,7 @@ apps/rag-core/
 | 重排（Rerank）                            | `retrievers/`（召回后精排）          |
 | 上下文构造 + 答案生成（含引用）           | `generation/`                        |
 | 编排内核（retrieve/answer 串起整条链）    | `kernel/`                            |
-| 协议外壳（REST / MCP）                    | `api/`（`app.py` / `mcp_server.py`） |
+| 协议外壳（REST / MCP）                    | `api/RESTful/` + `api/mcp/mcp_server.py` |
 
 ### 评估
 
@@ -97,7 +98,7 @@ apps/rag-core/
 
 ```bash
 uv sync
-uv run uvicorn src.api.app:app --reload --reload-dir src --port 8000
+uv run uvicorn src.app:app --reload --reload-dir src --port 8000
 ```
 
 ## 常用任务
@@ -126,7 +127,7 @@ uv run uvicorn src.api.app:app --reload --reload-dir src --port 8000
 ## MCP Server
 
 ```bash
-uv run ogas-rag-mcp            # 或 python -m src.api.mcp_server
+uv run ogas-rag-mcp            # 或 python -m src.api.mcp.mcp_server
 ```
 
 ## 待实现（按 RAG.md）

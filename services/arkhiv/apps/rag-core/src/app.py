@@ -1,10 +1,10 @@
-"""FastAPI 应用入口（uvicorn src.api.app:app）。"""
+"""FastAPI 应用入口（uvicorn src.app:app）。"""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.health import router as health_router
-from src.api.router import api_router
+from src.api.RESTful.health import router as health_router
+from src.api.RESTful.router import api_router
 from src.core.config import get_settings
 
 settings = get_settings()
