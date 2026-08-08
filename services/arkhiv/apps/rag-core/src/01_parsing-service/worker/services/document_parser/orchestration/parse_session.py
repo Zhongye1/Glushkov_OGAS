@@ -6,12 +6,12 @@ import os
 import re
 from dataclasses import dataclass
 
-from app.services.document_parser.orchestration.parse_input import ParseInput
-from app.services.document_parser.profiling.doc_profiler import (
+from worker.services.document_parser.orchestration.parse_input import ParseInput
+from worker.services.document_parser.profiling.doc_profiler import (
     DocumentProfile,
     profile_document,
 )
-from app.services.document_parser.support.stage_profiler import stage_timer
+from worker.services.document_parser.support.stage_profiler import stage_timer
 
 _UNSAFE_PATH_RE = re.compile(r"[\\/:*?\"<>|\s]+")
 

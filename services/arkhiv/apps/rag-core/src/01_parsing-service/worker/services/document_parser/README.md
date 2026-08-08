@@ -30,7 +30,7 @@ document_parser/
 ## 用法
 
 ```python
-from app.services.document_parser.parse_service import parse_job
+from worker.services.document_parser.parse_service import parse_job
 
 result, state = parse_job("/tmp/sample.md", "sample.md", "/tmp/out")
 print(state.status)              # JobStatus.DONE

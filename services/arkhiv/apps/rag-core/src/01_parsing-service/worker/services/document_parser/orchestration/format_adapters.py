@@ -10,8 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from app.services.document_parser.orchestration.parse_output import ParseOutput
-from app.services.document_parser.orchestration.parse_session import ParseSession
+from worker.services.document_parser.orchestration.parse_output import ParseOutput
+from worker.services.document_parser.orchestration.parse_session import ParseSession
 
 
 class DocumentParseAdapter(Protocol):
@@ -29,7 +29,7 @@ class MarkdownParseAdapter:
     document_format: object
 
     def parse(self, session: ParseSession) -> ParseOutput:
-        from app.services.document_parser.formats.markdown.parser import parse_md
+        from worker.services.document_parser.formats.markdown.parser import parse_md
 
         blocks = parse_md(
             session.full_output_dir,
@@ -46,7 +46,7 @@ class PdfParseAdapter:
     document_format: object
 
     def parse(self, session: ParseSession) -> ParseOutput:
-        from app.services.document_parser.formats.pdf.parser import parse_pdfs
+        from worker.services.document_parser.formats.pdf.parser import parse_pdfs
 
         blocks = parse_pdfs(
             session.file_full_path,

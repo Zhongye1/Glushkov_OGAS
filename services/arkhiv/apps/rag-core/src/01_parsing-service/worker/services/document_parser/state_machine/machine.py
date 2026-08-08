@@ -8,10 +8,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from app.services.document_parser.state_machine.states import (
+from shared.contracts.parsing import JobState, JobStatus
+from worker.services.document_parser.state_machine.states import (
     TERMINAL_STATUSES,
 )
-from shared.contracts.parsing import JobState, JobStatus
 
 
 class IllegalTransitionError(ValueError):

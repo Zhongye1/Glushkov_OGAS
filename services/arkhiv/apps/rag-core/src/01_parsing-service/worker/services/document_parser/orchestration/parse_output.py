@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from app.services.document_parser.ir.blocks import Block
+from worker.services.document_parser.ir.blocks import Block
 
 
 @dataclass(frozen=True)

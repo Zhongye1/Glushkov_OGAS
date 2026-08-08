@@ -6,8 +6,8 @@
 
 from __future__ import annotations
 
-from app.services.document_parser.ir.parsed_row import ParsedRow
-from app.services.document_parser.support.identifiers import gen_str_codes
+from worker.services.document_parser.ir.parsed_row import ParsedRow
+from worker.services.document_parser.support.identifiers import gen_str_codes
 
 _REF_MARKERS = ("![", "<table", "<img", "TABLE_REF", "IMAGE_REF")
 

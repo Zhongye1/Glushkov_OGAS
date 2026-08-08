@@ -6,12 +6,12 @@ office 适配器，故省略；恢复时在 route_document_parse 中插回即可
 
 from __future__ import annotations
 
-from app.services.document_parser.orchestration.format_router import (
+from worker.services.document_parser.orchestration.format_router import (
     get_document_parse_adapter,
     resolve_document_format,
 )
-from app.services.document_parser.orchestration.parse_output import ParseOutput
-from app.services.document_parser.orchestration.parse_session import ParseSession
+from worker.services.document_parser.orchestration.parse_output import ParseOutput
+from worker.services.document_parser.orchestration.parse_session import ParseSession
 
 
 def route_document_parse(session: ParseSession) -> ParseOutput:

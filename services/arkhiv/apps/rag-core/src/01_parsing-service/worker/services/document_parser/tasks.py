@@ -7,9 +7,9 @@ worker 契约：
 - 输入与产物一律走 ArtifactStorage 的对象存储 key，不依赖本地路径。
 
 注册名固定为 ``app.core.tasks.document_ingestion_tasks.parse_task``（Celery
-按名字路由，与文件位置无关）：这是 API ↔ worker 的契约，API 侧 dispatcher
-将来按这个名字向队列发消息，worker 按这个名字注册消费。MVP 未装 Celery 时
-退化为纯函数直调。
+按名字路由，与本地包路径 worker.services.* 无关）：这是 API ↔ worker 的
+契约名，API 侧 dispatcher 将来按这个名字向队列发消息，worker 按这个名字
+注册消费。MVP 未装 Celery 时退化为纯函数直调。
 """
 
 from __future__ import annotations
@@ -18,8 +18,8 @@ import json
 import os
 from typing import Any
 
-from app.services.document_parser.parse_service import parse_job
-from app.services.document_parser.storage.artifact_storage import get_artifact_storage
+from worker.services.document_parser.parse_service import parse_job
+from worker.services.document_parser.storage.artifact_storage import get_artifact_storage
 
 try:  # Celery 为可选依赖（pyproject 未声明时退化为直调）
     from celery import shared_task as _celery_shared_task

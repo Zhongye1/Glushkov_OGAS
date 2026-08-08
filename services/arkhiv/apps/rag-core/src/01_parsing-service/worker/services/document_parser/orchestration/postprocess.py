@@ -6,8 +6,8 @@ import os
 import re
 from dataclasses import dataclass, field
 
-from app.services.document_parser.ir.blocks import Block
-from app.services.document_parser.support.stage_profiler import stage_timer
+from worker.services.document_parser.ir.blocks import Block
+from worker.services.document_parser.support.stage_profiler import stage_timer
 
 _IMG_SRC_BASENAME_RE = re.compile(
     r"""<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']""",

@@ -5,15 +5,15 @@
 
 from __future__ import annotations
 
-from app.services.document_parser.orchestration.parse_input import ParseInput
-from app.services.document_parser.orchestration.parse_output import ParseOutput
-from app.services.document_parser.orchestration.parse_session import build_parse_session
-from app.services.document_parser.orchestration.postprocess import apply_parse_postprocess
-from app.services.document_parser.orchestration.route_parse import route_document_parse
-from app.services.document_parser.packaging.chunks import build_chunks
-from app.services.document_parser.packaging.manifest import build_manifest, make_document_id
-from app.services.document_parser.packaging.writer import write_artifacts
-from app.services.document_parser.support.stage_profiler import (
+from worker.services.document_parser.orchestration.parse_input import ParseInput
+from worker.services.document_parser.orchestration.parse_output import ParseOutput
+from worker.services.document_parser.orchestration.parse_session import build_parse_session
+from worker.services.document_parser.orchestration.postprocess import apply_parse_postprocess
+from worker.services.document_parser.orchestration.route_parse import route_document_parse
+from worker.services.document_parser.packaging.chunks import build_chunks
+from worker.services.document_parser.packaging.manifest import build_manifest, make_document_id
+from worker.services.document_parser.packaging.writer import write_artifacts
+from worker.services.document_parser.support.stage_profiler import (
     cleanup_stage_tracker,
     get_stage_timings,
     init_stage_tracker,

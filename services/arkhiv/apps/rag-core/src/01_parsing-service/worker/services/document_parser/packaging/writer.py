@@ -10,13 +10,13 @@ import json
 import os
 from typing import Any
 
-from app.services.document_parser.ir.blocks import (
+from worker.services.document_parser.ir.blocks import (
     Block,
     blocks_to_markdown,
     build_section_tree,
 )
-from app.services.document_parser.packaging.chunks import Chunk
-from app.services.document_parser.packaging.manifest import Manifest
+from worker.services.document_parser.packaging.chunks import Chunk
+from worker.services.document_parser.packaging.manifest import Manifest
 
 
 def write_artifacts(

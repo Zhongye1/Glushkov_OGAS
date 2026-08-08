@@ -9,15 +9,15 @@ from __future__ import annotations
 import os
 import shutil
 
-from app.services.document_parser.formats.markdown.parser import parse_md
-from app.services.document_parser.formats.pdf.provider import get_pdf_provider
-from app.services.document_parser.formats.pdf.shard_splitter import (
+from worker.services.document_parser.formats.markdown.parser import parse_md
+from worker.services.document_parser.formats.pdf.provider import get_pdf_provider
+from worker.services.document_parser.formats.pdf.shard_splitter import (
     AgentShard,
     bin_pack_shards,
     split_pdf,
 )
-from app.services.document_parser.ir.blocks import Block
-from app.services.document_parser.support.stage_profiler import stage_timer
+from worker.services.document_parser.ir.blocks import Block
+from worker.services.document_parser.support.stage_profiler import stage_timer
 
 MAX_PDF_SHARD_PAGES = 200
 

@@ -12,8 +12,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.services.document_parser.ir.blocks import Block, make_block_id
-from app.services.document_parser.ir.parsed_row import (
+from worker.services.document_parser.ir.blocks import Block, make_block_id
+from worker.services.document_parser.ir.parsed_row import (
     ParsedRow,
     ParsedRowsBuilder,
     process_dup_paths_df,

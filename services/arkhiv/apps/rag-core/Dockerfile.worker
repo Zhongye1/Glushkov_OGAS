@@ -19,4 +19,4 @@ RUN pip install --no-cache-dir ./packages/shared-python && \
 
 # 队列消费者只需要 broker 凭证（服务身份），不需要任何用户鉴权；
 # 产物经 ARTIFACT_STORAGE=local|s3 落到共享存储，默认 local 仅用于开发
-CMD ["python", "-m", "app.services.document_parser.worker_app"]
+CMD ["python", "-m", "worker.services.document_parser.worker_app"]

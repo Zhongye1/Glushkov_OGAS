@@ -38,13 +38,13 @@ apps/rag-core/
 
 - API：`uvicorn src.app:app`
 - MCP：`python -m src.api.mcp.mcp_server`
-- 解析 worker：`python -m app.services.document_parser.worker_app`（`01_parsing-service` 下）
+- 解析 worker：`python -m worker.services.document_parser.worker_app`（`01_parsing-service` 下）
 - 配置：`src/core/config.py`（环境变量，见 `.env.example`）
 
 ## 文档解析服务（01_parsing-service）
 
 `src/01_parsing-service/` 是**文档解析 worker**（纯执行体），只包含
-`app/services/document_parser/` 解析内核：输入原始文件 + 元数据 → 输出
+`worker/services/document_parser/` 解析内核：输入原始文件 + 元数据 → 输出
 结构化产物包（full.md / chunks / tables / manifest）。这里**没有 auth、
 没有 HTTP 接口**——鉴权、建 job、派发、查进度/结果等入口职责都在 API 层
 （`src/app.py` 所在的编排应用），worker 只消费队列任务、读写共享存储。
@@ -63,7 +63,7 @@ worker 架构约定（与 Knowhere 一致）：
 uvicorn src.app:app
 
 # 解析 worker（队列消费者，独立进程/镜像）
-PYTHONPATH=src/01_parsing-service python -m app.services.document_parser.worker_app
+PYTHONPATH=src/01_parsing-service python -m worker.services.document_parser.worker_app
 ```
 
 镜像：`Dockerfile`（API）与 `Dockerfile.worker`（worker），构建上下文均为仓库根

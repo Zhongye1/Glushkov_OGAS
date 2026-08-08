@@ -9,16 +9,16 @@ from __future__ import annotations
 import os
 import re
 
-from app.services.document_parser.formats.markdown.heading import (
+from worker.services.document_parser.formats.markdown.heading import (
     MD_IMAGE_PATTERN,
     eval_md_headings,
     md_heading_match,
 )
-from app.services.document_parser.formats.markdown.parse_state import MarkdownParseState
-from app.services.document_parser.formats.markdown.row_updater import update_df_list
-from app.services.document_parser.ir.blocks import Block
-from app.services.document_parser.support.identifiers import get_str_time
-from app.services.document_parser.support.stage_profiler import stage_timer
+from worker.services.document_parser.formats.markdown.parse_state import MarkdownParseState
+from worker.services.document_parser.formats.markdown.row_updater import update_df_list
+from worker.services.document_parser.ir.blocks import Block
+from worker.services.document_parser.support.identifiers import get_str_time
+from worker.services.document_parser.support.stage_profiler import stage_timer
 
 
 def parse_md(

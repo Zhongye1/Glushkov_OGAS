@@ -7,9 +7,9 @@ worker 架构约定：
 - 输入与产物经 ArtifactStorage 的对象存储 key 传递，不依赖本地磁盘路径。
 
 独立进程启动（worker 镜像）：
-    python -m app.services.document_parser.worker_app
+    python -m worker.services.document_parser.worker_app
 或等价地：
-    celery -A app.services.document_parser.worker_app:celery_app worker -Q parsing
+    celery -A worker.services.document_parser.worker_app:celery_app worker -Q parsing
 
 配置（环境变量）：
     CELERY_BROKER_URL         broker 地址，默认 redis://localhost:6379/0
@@ -38,7 +38,7 @@ WORKER_QUEUES = [
 
 celery_app = Celery("ogas-parsing-worker", broker=BROKER_URL, backend=RESULT_BACKEND)
 celery_app.conf.update(
-    imports=("app.services.document_parser.tasks",),
+    imports=("worker.services.document_parser.tasks",),
     task_serializer="json",
     result_serializer="json",
     accept_content=["json"],

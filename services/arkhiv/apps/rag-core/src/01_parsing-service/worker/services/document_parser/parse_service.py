@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import uuid
 
-from app.services.document_parser.orchestration.parse_input import ParseInput, ParseOptions
-from app.services.document_parser.orchestration.parse_pipeline import (
+from shared.contracts.parsing import JobState
+from worker.services.document_parser.orchestration.parse_input import ParseInput, ParseOptions
+from worker.services.document_parser.orchestration.parse_pipeline import (
     ParsePipelineResult,
     run_parse_pipeline,
 )
-from app.services.document_parser.state_machine.machine import (
+from worker.services.document_parser.state_machine.machine import (
     JobStateMachine,
 )
-from app.services.document_parser.state_machine.states import JobStatus
-from shared.contracts.parsing import JobState
+from worker.services.document_parser.state_machine.states import JobStatus
 
 
 def checkerboard_parse_output(
