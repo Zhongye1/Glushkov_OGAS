@@ -11,7 +11,7 @@ import hashlib
 import json
 import os
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 DEFAULT_ALL_DF_COLS: str = (
@@ -92,7 +92,7 @@ class ParsedRow:
         ]
 
     def to_dict(self) -> dict[str, object]:
-        return dict(zip(PARSER_ROW_COLUMNS, self.to_list()))
+        return dict(zip(PARSER_ROW_COLUMNS, self.to_list(), strict=True))
 
 
 class ParsedRowsBuilder:
@@ -173,7 +173,7 @@ def blocks_to_dataframe(blocks, *, addtime: str | None = None):
     标题 block 不生成行（层级编码在 section_path），与参考实现一致。
     """
     builder = ParsedRowsBuilder()
-    stamp = addtime or datetime.now(timezone.utc).isoformat()
+    stamp = addtime or datetime.now(UTC).isoformat()
     for block in blocks:
         if block.type == "heading":
             continue

@@ -22,8 +22,8 @@ class ParseOutput:
     def rows_count(self) -> int:
         return len(self.blocks)
 
-    def with_blocks(self, blocks: tuple[Block, ...]) -> "ParseOutput":
+    def with_blocks(self, blocks: tuple[Block, ...]) -> ParseOutput:
         return ParseOutput(output_dir=self.output_dir, blocks=blocks, parsed_df=self.parsed_df)
 
-    def with_dataframe(self, parsed_df: Any) -> "ParseOutput":
+    def with_dataframe(self, parsed_df: Any) -> ParseOutput:
         return ParseOutput(output_dir=self.output_dir, blocks=self.blocks, parsed_df=parsed_df)

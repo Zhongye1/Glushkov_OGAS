@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def gen_str_codes(source: str) -> str:
@@ -11,4 +11,4 @@ def gen_str_codes(source: str) -> str:
 
 
 def get_str_time() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()

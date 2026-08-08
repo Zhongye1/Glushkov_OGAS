@@ -8,8 +8,9 @@ positional rows 转成设计文档 01 的 IR Block 列表。
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 from app.services.document_parser.ir.blocks import Block, make_block_id
 from app.services.document_parser.ir.parsed_row import (
@@ -17,7 +18,6 @@ from app.services.document_parser.ir.parsed_row import (
     ParsedRowsBuilder,
     process_dup_paths_df,
 )
-from app.services.document_parser.support.identifiers import get_str_time
 
 ParserRowValues = list[str | int]
 

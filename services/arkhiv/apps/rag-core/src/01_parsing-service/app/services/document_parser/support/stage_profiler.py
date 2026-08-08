@@ -7,9 +7,10 @@ from __future__ import annotations
 
 import logging
 import threading
+from collections.abc import Iterator
 from contextlib import contextmanager
 from time import perf_counter
-from typing import Any, Iterator
+from typing import Any
 
 logger = logging.getLogger("document_parser.stage")
 

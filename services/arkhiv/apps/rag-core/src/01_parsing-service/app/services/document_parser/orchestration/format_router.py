@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from enum import Enum
+from enum import StrEnum
 
 from app.services.document_parser.orchestration.errors import UnsupportedFormatError
 from app.services.document_parser.orchestration.format_adapters import (
@@ -13,7 +13,7 @@ from app.services.document_parser.orchestration.format_adapters import (
 )
 
 
-class DocumentFormat(str, Enum):
+class DocumentFormat(StrEnum):
     TEXT = "text"
     FRAGMENT = "fragment"
     IMAGE = "image"
