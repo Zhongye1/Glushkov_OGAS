@@ -1,0 +1,22 @@
+# 解析 worker 镜像：队列消费者，无 HTTP、无鉴权（worker 架构约定见 README）。
+# 构建（build context = services/arkhiv 仓库根）：
+#   docker build -f apps/rag-core/Dockerfile.worker -t ogas-parsing-worker .
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH=/app/parsing_service
+
+WORKDIR /app
+
+# 共享契约层（无第三方依赖）→ 解析 worker 代码 → 运行依赖
+# 重依赖（pymupdf/boto3）按需装在这里，代码里保持惰性导入，开发环境不背这些包
+COPY packages/shared-python ./packages/shared-python
+COPY apps/rag-core/src/01_parsing-service ./parsing_service
+
+RUN pip install --no-cache-dir ./packages/shared-python && \
+    pip install --no-cache-dir "celery>=5.4" redis boto3 pymupdf
+
+# 队列消费者只需要 broker 凭证（服务身份），不需要任何用户鉴权；
+# 产物经 ARTIFACT_STORAGE=local|s3 落到共享存储，默认 local 仅用于开发
+CMD ["python", "-m", "app.services.document_parser.worker_app"]

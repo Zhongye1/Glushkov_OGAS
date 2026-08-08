@@ -13,7 +13,7 @@ apps/rag-core/
 │   │   ├── RESTful/     # REST 路由（health/rag/router）
 │   │   ├── mcp/          # MCP server（python -m src.api.mcp.mcp_server）
 │   │   └── schemas/     # 接口类型定义（HealthResponse/Chunk/Answer/...）
-│   ├── 01_parsing-service/          # 路由矩阵、Knowhere/PixelRAG 适配器、Celery 任务入口
+│   ├── 01_parsing-service/          # 文档解析接入：API shell + document_parser 解析内核（worker）
 │   ├── index/           # Milvus 文本/视觉存储、标签目录、文档结构
 │   ├── retrievers/      # Knowhere 图检索 + PixelRAG 视觉检索
 │   ├── router/          # 查询路由引擎与选择器链、语义缓存（Redis）
@@ -38,8 +38,39 @@ apps/rag-core/
 
 - API：`uvicorn src.app:app`
 - MCP：`python -m src.api.mcp.mcp_server`
-- Workers：`src.tasks.celery_app`（待接入 Celery）
+- 解析 worker：`python -m app.services.document_parser.worker_app`（`01_parsing-service` 下）
 - 配置：`src/core/config.py`（环境变量，见 `.env.example`）
+
+## 文档解析服务（01_parsing-service）
+
+`src/01_parsing-service/` 是文档解析接入层，内部是「API shell + 解析内核」两层：
+
+- `app/`（api / repositories / services/{auth,billing,document_ingestion,...}）：完整接入
+  API 服务，负责鉴权、建 job、派发任务、查进度/结果。依赖 `shared.*` 契约层
+  （`packages/shared-python`），当前为参考实现，尚未完整落地。
+- `app/services/document_parser/`：解析内核（worker 执行单元），单一职责：输入
+  原始文件 + 元数据 → 输出结构化产物包（full.md / chunks / tables / manifest）。
+  架构见 `docs/parsing-service/`（IR 模型 / 适配器接口 / 状态机 / 产物打包）。
+
+worker 架构约定（与 Knowhere 一致）：
+
+- worker 是队列消费者，**不对外开 HTTP 接口、不做用户鉴权**——鉴权收敛在 API 入口层；
+- API 鉴权后把 `tenant_id / namespace / s3_key` 作为任务消息透传，worker 仅用它们做数据隔离；
+- 输入与产物一律经对象存储 key 传递（`ArtifactStorage`），不依赖本地磁盘路径。
+
+启动方式：
+
+```bash
+# API（编排 + 鉴权 + 派发）
+uvicorn src.app:app
+
+# 解析 worker（队列消费者，独立进程/镜像）
+PYTHONPATH=src/01_parsing-service python -m app.services.document_parser.worker_app
+```
+
+镜像：`Dockerfile`（API）与 `Dockerfile.worker`（worker），构建上下文均为仓库根
+`services/arkhiv`。任务契约在 `packages/shared-python/shared/contracts/`
+（`parsing.py`：JobStatus / JobState / ParseJob；`artifact.py`：Manifest）。
 
 ## RAG 流程
 
