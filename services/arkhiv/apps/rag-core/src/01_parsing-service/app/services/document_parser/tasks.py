@@ -1,4 +1,4 @@
-"""解析 worker 任务入口（对接 worker_dispatcher.py 的派发契约）。
+"""解析 worker 任务入口（API 侧 dispatcher 按注册名派发）。
 
 worker 契约：
 - worker 是队列消费者，不对外开接口、不做用户鉴权；
@@ -7,9 +7,9 @@ worker 契约：
 - 输入与产物一律走 ArtifactStorage 的对象存储 key，不依赖本地路径。
 
 注册名固定为 ``app.core.tasks.document_ingestion_tasks.parse_task``（Celery
-按名字路由，与文件位置无关）。文件放 document_parser 内是当前可导入可测试
-的过渡：app/core/__init__.py 硬依赖尚未落地的 shared.* 包。MVP 未装 Celery
-时退化为纯函数直调。
+按名字路由，与文件位置无关）：这是 API ↔ worker 的契约，API 侧 dispatcher
+将来按这个名字向队列发消息，worker 按这个名字注册消费。MVP 未装 Celery 时
+退化为纯函数直调。
 """
 
 from __future__ import annotations
@@ -87,7 +87,7 @@ def _parse_task_impl(
 ) -> dict[str, Any]:
     """解析任务：拉原始文件 → document_parser.parse_job → 产物上传共享存储。
 
-    与 worker_dispatcher.py 的派发契约对齐：args=[job_id]，kwargs={user_id, job_type}；
+    与 API 侧派发契约对齐：args=[job_id]，kwargs={user_id, job_type}；
     tenant_id / namespace / s3_key 由 API 层鉴权后透传，用于数据隔离。
     """
     namespace = namespace or tenant_id

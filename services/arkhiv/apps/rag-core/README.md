@@ -13,7 +13,7 @@ apps/rag-core/
 │   │   ├── RESTful/     # REST 路由（health/rag/router）
 │   │   ├── mcp/          # MCP server（python -m src.api.mcp.mcp_server）
 │   │   └── schemas/     # 接口类型定义（HealthResponse/Chunk/Answer/...）
-│   ├── 01_parsing-service/          # 文档解析接入：API shell + document_parser 解析内核（worker）
+│   ├── 01_parsing-service/          # 文档解析 worker：document_parser 解析内核（无 HTTP/鉴权）
 │   ├── index/           # Milvus 文本/视觉存储、标签目录、文档结构
 │   ├── retrievers/      # Knowhere 图检索 + PixelRAG 视觉检索
 │   ├── router/          # 查询路由引擎与选择器链、语义缓存（Redis）
@@ -43,14 +43,12 @@ apps/rag-core/
 
 ## 文档解析服务（01_parsing-service）
 
-`src/01_parsing-service/` 是文档解析接入层，内部是「API shell + 解析内核」两层：
-
-- `app/`（api / repositories / services/{auth,billing,document_ingestion,...}）：完整接入
-  API 服务，负责鉴权、建 job、派发任务、查进度/结果。依赖 `shared.*` 契约层
-  （`packages/shared-python`），当前为参考实现，尚未完整落地。
-- `app/services/document_parser/`：解析内核（worker 执行单元），单一职责：输入
-  原始文件 + 元数据 → 输出结构化产物包（full.md / chunks / tables / manifest）。
-  架构见 `docs/parsing-service/`（IR 模型 / 适配器接口 / 状态机 / 产物打包）。
+`src/01_parsing-service/` 是**文档解析 worker**（纯执行体），只包含
+`app/services/document_parser/` 解析内核：输入原始文件 + 元数据 → 输出
+结构化产物包（full.md / chunks / tables / manifest）。这里**没有 auth、
+没有 HTTP 接口**——鉴权、建 job、派发、查进度/结果等入口职责都在 API 层
+（`src/app.py` 所在的编排应用），worker 只消费队列任务、读写共享存储。
+架构见 `docs/parsing-service/`（IR 模型 / 适配器接口 / 状态机 / 产物打包）。
 
 worker 架构约定（与 Knowhere 一致）：
 

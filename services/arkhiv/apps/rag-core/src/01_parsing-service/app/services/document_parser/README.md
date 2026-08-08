@@ -1,6 +1,6 @@
 # document_parser：文档解析服务核心（MVP 骨架）
 
-对应设计文档：`apps/rag-core/docs/01_parsing-service/`（01 IR / 02 适配器 /
+对应设计文档：`apps/rag-core/docs/parsing-service/`（01 IR / 02 适配器 /
 03 状态机 / 04 PDF+Markdown / 05 打包 / 06 参考实现对照）。
 
 ## 结构
