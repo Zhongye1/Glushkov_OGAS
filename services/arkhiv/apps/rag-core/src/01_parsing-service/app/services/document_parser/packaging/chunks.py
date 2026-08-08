@@ -49,6 +49,7 @@ def build_chunks(
     section_blocks: list[Block] = []
     section_path = ""
     section_page: int | None = None
+    current_section_chunk_id: str | None = None
 
     def next_chunk_id() -> str:
         nonlocal counter
@@ -57,15 +58,16 @@ def build_chunks(
         return chunk_id
 
     def flush_section() -> None:
-        nonlocal section_blocks
+        nonlocal section_blocks, current_section_chunk_id
         if not section_blocks:
             return
         text = _blocks_text(section_blocks)
         if not text:
             return
+        chunk_id = next_chunk_id()
         chunks.append(
             Chunk(
-                chunk_id=next_chunk_id(),
+                chunk_id=chunk_id,
                 type="text",
                 section_path=section_path,
                 block_ids=tuple(block.id for block in section_blocks),
@@ -74,6 +76,7 @@ def build_chunks(
                 page=section_page,
             )
         )
+        current_section_chunk_id = chunk_id
         section_blocks = []
 
     for block in blocks:
@@ -85,12 +88,7 @@ def build_chunks(
 
         if block.type in ("table", "image"):
             flush_section()
-            parent = chunks[-1] if chunks else None
-            parent_id = (
-                parent.chunk_id
-                if parent is not None and parent.parent_chunk_id is None
-                else None
-            )
+            parent_id = current_section_chunk_id
             chunks.append(
                 Chunk(
                     chunk_id=next_chunk_id(),

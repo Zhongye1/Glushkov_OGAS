@@ -34,7 +34,9 @@ class DeferredSummaryTask:
 
 
 def escape_path_segment(segment: str) -> str:
-    return re.sub(r"[\\/:*?\"<>|\s]+", "_", segment.strip())
+    """转义路径分隔符（先转义反斜杠，保证往返可逆），与参考实现一致。"""
+    text = segment.strip()
+    return text.replace("\\", "\\\\").replace("/", "\\/")
 
 
 @dataclass
@@ -207,7 +209,14 @@ class MarkdownParseState:
             }.get(row_type, "paragraph")
             content_payload: dict[str, Any] = {"text": content}
             if block_type == "image":
-                content_payload["src"] = content
+                image_match = re.match(r"^!\[([^\]]*)\]\(([^)]+)\)$", content)
+                if image_match:
+                    content_payload = {
+                        "caption": image_match.group(1),
+                        "src": image_match.group(2),
+                    }
+                else:
+                    content_payload["src"] = content
             if block_type == "table":
                 table_match = re.match(
                     r"^\[TABLE\s+([^\]]+)\]\(([^)]+)\)$", content
