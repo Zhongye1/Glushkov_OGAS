@@ -6,13 +6,12 @@ JobState 映射为 job 表、迁移落库即可；幂等/租约/重试见设计�
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.services.document_parser.state_machine.states import (
     TERMINAL_STATUSES,
-    JobStatus,
 )
+from shared.contracts.parsing import JobState, JobStatus
 
 
 class IllegalTransitionError(ValueError):
@@ -45,19 +44,6 @@ TRANSITIONS: dict[JobStatus, frozenset[JobStatus]] = {
 }
 
 
-@dataclass(frozen=True)
-class JobState:
-    job_id: str
-    status: JobStatus = JobStatus.PENDING
-    stage: str = ""
-    attempt: int = 0
-    error_code: str | None = None
-    error_message: str | None = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    started_at: datetime | None = None
-    completed_at: datetime | None = None
-
-
 class JobStateMachine:
     """校验并执行状态迁移；非法迁移抛 IllegalTransitionError。"""
 
@@ -76,7 +62,7 @@ class JobStateMachine:
     ) -> JobState:
         if not self.can_transition(state.status, target):
             raise IllegalTransitionError(state.status, target)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         started_at = state.started_at
         if target is JobStatus.RUNNING and started_at is None:
             started_at = now

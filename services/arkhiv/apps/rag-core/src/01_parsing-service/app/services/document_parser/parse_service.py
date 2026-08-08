@@ -10,10 +10,10 @@ from app.services.document_parser.orchestration.parse_pipeline import (
     run_parse_pipeline,
 )
 from app.services.document_parser.state_machine.machine import (
-    JobState,
     JobStateMachine,
 )
 from app.services.document_parser.state_machine.states import JobStatus
+from shared.contracts.parsing import JobState
 
 
 def checkerboard_parse_output(

@@ -1,0 +1,17 @@
+[project]
+name = "ogas-shared"
+version = "0.1.0"
+description = "OGAS Python 共享契约层：任务/产物契约（对齐 Knowhere packages/shared-python）"
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["shared"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
