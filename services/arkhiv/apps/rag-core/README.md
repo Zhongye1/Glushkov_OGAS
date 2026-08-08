@@ -13,7 +13,7 @@ apps/rag-core/
 │   │   ├── RESTful/     # REST 路由（health/rag/router）
 │   │   ├── mcp/          # MCP server（python -m src.api.mcp.mcp_server）
 │   │   └── schemas/     # 接口类型定义（HealthResponse/Chunk/Answer/...）
-│   ├── ingest/          # 路由矩阵、Knowhere/PixelRAG 适配器、Celery 任务入口
+│   ├── 01_parsing-service/          # 路由矩阵、Knowhere/PixelRAG 适配器、Celery 任务入口
 │   ├── index/           # Milvus 文本/视觉存储、标签目录、文档结构
 │   ├── retrievers/      # Knowhere 图检索 + PixelRAG 视觉检索
 │   ├── router/          # 查询路由引擎与选择器链、语义缓存（Redis）
@@ -57,26 +57,26 @@ apps/rag-core/
 
 ### 离线链路（接入 → 切片 → 向量化 → 入库）
 
-| 阶段                             | 对应包         |
-| -------------------------------- | -------------- |
-| 数据源接入、解析适配、解析路由   | `ingest/`      |
-| 附件/图表解析（QA 附图、表格）   | `attachments/` |
-| 向量化 + 索引构建（文本/视觉）   | `index/`       |
-| 原始文件存储、去重               | `storage/`     |
-| 异步任务编排（接入/建索引跑批）  | `tasks/`       |
-| 文档/库元数据持久化              | `db/`          |
-| 知识库生命周期（建库/删库/统计） | `kb/`          |
+| 阶段                             | 对应包                |
+| -------------------------------- | --------------------- |
+| 数据源接入、解析适配、解析路由   | `01_parsing-service/` |
+| 附件/图表解析（QA 附图、表格）   | `attachments/`        |
+| 向量化 + 索引构建（文本/视觉）   | `index/`              |
+| 原始文件存储、去重               | `storage/`            |
+| 异步任务编排（接入/建索引跑批）  | `tasks/`              |
+| 文档/库元数据持久化              | `db/`                 |
+| 知识库生命周期（建库/删库/统计） | `kb/`                 |
 
 ### 在线链路（query → 路由 → 召回 → 重排 → 生成）
 
-| 阶段                                      | 对应包                               |
-| ----------------------------------------- | ------------------------------------ |
-| Query 路由（文本/视觉、要不要检索、选库） | `router/`                            |
-| 语义缓存（Redis，命中跳过检索+生成）      | `router/cache.py`                    |
-| 召回（向量 ANN / 图检索 / 视觉检索）      | `retrievers/`                        |
-| 重排（Rerank）                            | `retrievers/`（召回后精排）          |
-| 上下文构造 + 答案生成（含引用）           | `generation/`                        |
-| 编排内核（retrieve/answer 串起整条链）    | `kernel/`                            |
+| 阶段                                      | 对应包                                   |
+| ----------------------------------------- | ---------------------------------------- |
+| Query 路由（文本/视觉、要不要检索、选库） | `router/`                                |
+| 语义缓存（Redis，命中跳过检索+生成）      | `router/cache.py`                        |
+| 召回（向量 ANN / 图检索 / 视觉检索）      | `retrievers/`                            |
+| 重排（Rerank）                            | `retrievers/`（召回后精排）              |
+| 上下文构造 + 答案生成（含引用）           | `generation/`                            |
+| 编排内核（retrieve/answer 串起整条链）    | `kernel/`                                |
 | 协议外壳（REST / MCP）                    | `api/RESTful/` + `api/mcp/mcp_server.py` |
 
 ### 评估
