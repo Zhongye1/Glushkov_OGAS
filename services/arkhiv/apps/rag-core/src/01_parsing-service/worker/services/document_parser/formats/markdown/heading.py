@@ -9,7 +9,9 @@ from __future__ import annotations
 import re
 
 MD_IMAGE_PATTERN = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
-_NUMBERED_HEADING_RE = re.compile(r"^(\d+(?:\.\d+)*)[、.．]\s*(.*)$")
+_NUMBERED_HEADING_RE = re.compile(
+    r"^(\d+(?:\.\d+)*)(?:\s+|[、]\s*|[.．]\s+)(.*)$"
+)
 
 
 def md_heading_match(line: str, as_is: bool = False) -> tuple[str, int]:
